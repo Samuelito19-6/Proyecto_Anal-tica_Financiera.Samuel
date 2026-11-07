@@ -56,8 +56,10 @@ R// ° Responden con precisión matemática al "QUÉ ocurrió" y a la medición 
 - **Variables disponibles:** Fecha, Precios de Apertura, Máximo, Mínimo, Cierre, Cierre Ajustado y Volumen.
 - **Limitaciones de los datos:** El ETF IBIT comenzó a cotizar a principios de 2024, por lo que su serie histórica es más corta que la de los demás activos.
 
-**Primera prueba:** [Enlace al notebook o archivo que descarga o consulta datos; indica qué funcionó y qué no]
-
+- **Primera prueba:** Se ejecutó la extracción de datos diarios a 3 años mediante `yfinance` en Google Colab.
+  - **Funcionó:** Descarga completa de 753 registros de precios de cierre ajustados y exportación a `datos_historicos_limpios.csv`.
+  - **Ajuste realizado:** Se detectaron exactamente 44 registros nulos iniciales en `IBIT` (comenzó a cotizar el 11 de enero de 2024), por lo que se aplicó `dropna()` para alinear las 6 series temporales en una ventana comparable de **709 días hábiles** 
+    
 ## 4. Metodología de análisis · S25–S26
 
 **Investiga:** ¿qué indicadores permiten responder la pregunta principal? ¿cómo se calculan? ¿qué interpretación y limitaciones tienen?
