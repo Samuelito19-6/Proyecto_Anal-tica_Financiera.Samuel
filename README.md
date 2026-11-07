@@ -5,7 +5,7 @@
 **Curso:** Lenguajes de Programación · Ingeniería Financiera  
 **Concurso:** 12 de noviembre de 2026  
 **Simulacro:** 10 de noviembre de 2026  
-**Tecnología:** [Python + Streamlit / R + Shiny / otra interfaz en Python o R]
+**Tecnología:** Python + Streamlit
 
 ## 1. Identificación del proyecto
 
