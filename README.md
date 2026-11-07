@@ -11,7 +11,7 @@
 
 - **Nombre de la aplicación:** Risk IT All 4u
 - **Equipo e integrantes:** Samuel David Peinado Guerrero
-- **Enlace a la aplicación:** [Pendiente / URL]
+- **Enlace a la aplicación:** https://w5yuxtwyqgmcvc6imxyo73.streamlit.app/
 - **Repositorio del proyecto:** https://github.com/Samuelito19-6/Proyecto_Anal-tica_Financiera.Samuel.git
 - **Última actualización:** 2026-11-05
 
