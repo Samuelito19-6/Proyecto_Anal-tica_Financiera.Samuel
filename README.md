@@ -86,7 +86,7 @@ No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y
 | **Gráfico de Caídas (*Underwater / Drawdown*)** | ¿Cuál es la profundidad y duración de las peores caídas de cada activo? | Fecha (eje X) vs. Porcentaje de caída desde máximos históricos (eje Y). | Visualización clara del riesgo a la baja y comparación del tiempo de recuperación entre activos individuales y ETFs. |
 | **Matriz de Correlación (*Heatmap*)** | ¿Qué tan diversificado está realmente el conjunto de activos seleccionados? | Coeficiente de correlación de Pearson entre los 6 activos. | Detección de pares altamente correlacionados (ej. `MSTR`–`IBIT` o `NVDA`–`QQQ`) frente a activos con baja correlación útil para optimizar portafolios. |
 
-**Primer resultado verificable:** [Enlace a un cálculo o gráfico realizado con datos reales y una interpretación breve]
+**Primer resultado verificable:** https://colab.research.google.com/drive/1-YiZ39ITof0xbQtT641O7II8fVfvbhGa?usp=sharing
 
 ## 5. Diseño de la aplicación · S25
 
