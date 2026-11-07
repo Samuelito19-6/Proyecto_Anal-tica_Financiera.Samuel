@@ -9,23 +9,32 @@
 
 ## 1. Identificación del proyecto
 
-- **Nombre de la aplicación:** [Nombre]
-- **Equipo e integrantes:** [Nombres y aportes]
+- **Nombre de la aplicación:** Risk IT All 4u
+- **Equipo e integrantes:** Samuel David Peinado Guerrero
 - **Enlace a la aplicación:** [Pendiente / URL]
-- **Repositorio del proyecto:** [URL]
-- **Última actualización:** [AAAA-MM-DD]
+- **Repositorio del proyecto:** 
+- **Última actualización:** 2026-11-05
 
 ## 2. ¿Qué queremos investigar? · S25
 
-**Investiga:** ¿qué significa analizar el comportamiento histórico de un activo financiero? ¿Qué preguntas pueden responderse con datos de mercado y cuáles no?
+**Investiga:** ¿Qué significa analizar el comportamiento histórico de un activo financiero?
+R// Significa estudiar de manera cuantitativa los periodos de tiempo en los datos pasados de los activos, para así identificar patrones de comportamiento, niveles de riesgo y rendimiento.
 
-- **Situación o fenómeno de interés:** [Explica qué deseas comprender]
-- **Pregunta principal:** [Formula una pregunta concreta, delimitada y que pueda responderse con datos históricos]
-- **Objetivo del análisis:** [Qué esperas analizar, comparar o describir]
-- **Importancia financiera:** [Por qué importa estudiar este comportamiento]
-- **Preguntas complementarias:** [Opcionales]
+¿Qué preguntas pueden responderse con datos de mercado y cuáles no?
+R// ° Responden con precisión matemática al "QUÉ ocurrió" y a la medición del riesgo estadístico, digamos, ¿Qué tan volátil es un activo en comparación con su ETF de referencia? o ¿Cómo se correlacionan los activos entre sí?, etc... 
+° Las preguntas que NO responden al "POR QUÉ" cualitativo ni garantizan sucesos futuros, es decir: ¿Cuánto valdrá la acción o el ETF mañana o el próximo año?, ¿Cómo reaccionará el activo ante eventos sin precedentes?, etc...
 
+- **Situación o fenómeno de interés:** Deseamos comprender cómo difiere el perfil de riesgo y rendimiento entre activos de gestión activa y activos de gestión pasiva en tres sectores clave: tecnología de gran capitalización, mercados emergentes/commodities y criptoactivos.
+  
+- **Pregunta principal:** ¿En qué medida la inversión en acciones individuales de alto crecimiento (NVDA, NU, MSTR) compensa la volatilidad adicional y el riesgo a la baja en comparación con sus respectivos ETFs de referencia (QQQ, EEM, IBIT) durante los últimos 3 años de datos históricos diarios?
+- **Objetivo del análisis:** Comparar cuantitativamente el riesgo y la rentabilidad ajustada por riesgo entre acciones individuales y ETFs representativos, evaluando además el efecto de la diversificación al construir un portafolio.
+  
+- **Importancia financiera:** Comprender este comportamiento es crucial para la toma de decisiones de inversión y la gestión de portafolios. Permite a los inversionistas determinar si la selección de acciones individuales genera un rendimiento superior suficiente para justificar la volatilidad adicional asumida.
+- 
+- **Preguntas complementarias:** ¿Cómo cambian las matrices de correlación entre estos activos en periodos de alta volatilidad frente a periodos de estabilidad de mercado?
+- 
 > **Comprueba:** ¿tu pregunta identifica activos, variables y un período de estudio? ¿Es posible responderla con datos disponibles?
+> R// Sí, la pregunta satisface plenamente ambos criterios ya que ve activos claramente delimitados: Compara 3 pares específicos de gestión activa vs. pasiva, y cuenta con disponibilidad de datos suficiente para poder darle solución.
 
 ## 3. Activos, datos y alcance · S25
 
@@ -33,14 +42,19 @@
 
 | Activo | Símbolo o ticker | Tipo | Razón para incluirlo |
 |---|---|---|---|
-| [Activo 1] | [Ticker] | [Cripto, commodity, acción, ETF...] | [Justificación] |
-| [Activo 2] | [Ticker] | [Tipo] | [Justificación] |
+| NVIDIA Corp. | NVDA| Acción | Gestión activa en tecnología de alto crecimiento e impacto en Inteligencia Artificial |
+| Invesco QQQ Trust | QQQ | ETF | Diversificación en el sector tecnológico |
+| Nu Holdings Ltd. | NU | Acción |Emergente líder en América Latina con fuerte dinamismo |
+| iShares MSCI | EEM | ETF | Diversificado de gestión pasiva que rastrea economías en desarrollo |
+| MicroStrategy Inc. | MSTR | Acción |Gestión activa con volatilidad extrema que actúa como proxy corporativo |
+| iShares Bitcoin Trust| IBIT | ETF | Ideal para comparar el riesgo entre una acción expuesta a criptoactivos y un ETF regulado |
 
-- **Fuente de datos:** [Proveedor y enlace a su documentación]
-- **Período:** [Inicio – fin]
-- **Frecuencia:** [Diaria, semanal, mensual...]
-- **Variables disponibles:** [Fecha, precio de cierre, volumen...]
-- **Limitaciones de los datos:** [Fechas faltantes, zona horaria, ajustes, diferencias de mercado...]
+
+- **Fuente de datos:** Yahoo Finance API a través de la librería yfinance en Python (Documentación de yfinance)
+- **Período:** 3 años (Noviembre 2023 – Noviembre 2026).
+- **Frecuencia:** Diaria
+- **Variables disponibles:** Fecha, Precios de Apertura, Máximo, Mínimo, Cierre, Cierre Ajustado y Volumen.
+- **Limitaciones de los datos:** El ETF IBIT comenzó a cotizar a principios de 2024, por lo que su serie histórica es más corta que la de los demás activos.
 
 **Primera prueba:** [Enlace al notebook o archivo que descarga o consulta datos; indica qué funcionó y qué no]
 
