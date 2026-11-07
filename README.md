@@ -56,7 +56,8 @@ R// ° Responden con precisión matemática al "QUÉ ocurrió" y a la medición 
 - **Variables disponibles:** Fecha, Precios de Apertura, Máximo, Mínimo, Cierre, Cierre Ajustado y Volumen.
 - **Limitaciones de los datos:** El ETF IBIT comenzó a cotizar a principios de 2024, por lo que su serie histórica es más corta que la de los demás activos.
 
-- **Primera prueba:** Se ejecutó la extracción de datos diarios a 3 años mediante `yfinance` en Google Colab.
+- **Primera prueba:** Enlace: https://github.com/Samuelito19-6/Proyecto_Anal-tica_Financiera.Samuel/blob/4f3cac808996d518638f9773424347ef208f2d71/Primera_Prueba_Datos_yf.ipynb
+  - **Se ejecutó** la extracción de datos diarios a 3 años mediante `yfinance` en Google Colab.
   - **Funcionó:** Descarga completa de 753 registros de precios de cierre ajustados y exportación a `datos_historicos_limpios.csv`.
   - **Ajuste realizado:** Se detectaron exactamente 44 registros nulos iniciales en `IBIT` (comenzó a cotizar el 11 de enero de 2024), por lo que se aplicó `dropna()` para alinear las 6 series temporales en una ventana comparable de **709 días hábiles** 
     
@@ -66,8 +67,12 @@ R// ° Responden con precisión matemática al "QUÉ ocurrió" y a la medición 
 
 | Indicador / técnica | ¿Qué mide? | ¿Por qué lo necesitamos? | Implementación |
 |---|---|---|---|
-| [Indicador 1] | [Concepto y fórmula, si aplica] | [Relación con la pregunta] | [Archivo o celda] |
-| [Indicador 2] | [Concepto y fórmula, si aplica] | [Justificación] | [Pendiente / enlace] |
+| **Retorno Logarítmico y Anualizado** | Variación porcentual continua del precio: $r_t = \ln(P_t / P_{t-1})$ y su proyección anual $E[R] = \bar{r} \times 252$. | Permite comparar en igualdad de condiciones el crecimiento de acciones individuales frente a ETFs durante la ventana de 709 días hábiles. | [Primera_Prueba_Datos_yf.ipynb](https://github.com/Samuelito19-6/Proyecto_Anal-tica_Financiera.Samuel/blob/4f3cac808996d518638f9773424347ef208f2d71/Primera_Prueba_Datos_yf.ipynb) |
+| **Volatilidad Anualizada ($\sigma$) y Móvil** | Dispersión de los retornos diarios escalada al año: $\sigma_{anual} = \sigma_{diaria} \times \sqrt{252}$. | Cuantifica el riesgo total asumido en acciones de alto crecimiento (`NVDA`, `NU`, `MSTR`) frente a la diversificación de sus ETFs (`QQQ`, `EEM`, `IBIT`). | Pendiente en `app.py` (Streamlit) |
+| **Ratio de Sharpe** | Rentabilidad excedente por cada unidad de riesgo asumido: $SR = \frac{E[R] - R_f}{\sigma_{anual}}$. | Responde directamente a la pregunta principal: determina si la rentabilidad extra de las acciones individuales realmente compensa su mayor volatilidad. | Pendiente en `app.py` (Streamlit) |
+| **Valor en Riesgo (VaR Histórico 95%)** | Pérdida máxima esperada en un día normal de negociación con un 95% de confianza. | Evalúa el riesgo de cola o escenarios adversos diarios, fundamental para comparar activos extremos como `MSTR` contra `IBIT`. | Pendiente en `app.py` (Streamlit) |
+| **Drawdown Máximo** | Caída porcentual máxima registrada desde un pico histórico hasta un valle posterior antes de alcanzar un nuevo máximo. | Mide la peor pérdida acumulada que habría sufrido un inversionista en cada par Acción vs. ETF durante el período 2024–2026. | Pendiente en `app.py` (Streamlit) |
+| **Coeficiente Beta ($\beta$) y Correlación** | Sensibilidad del activo respecto a su benchmark de mercado: $\beta_i = \frac{\text{Cov}(R_i, R_m)}{\text{Var}(R_m)}$. | Permite identificar qué tan amplificados son los movimientos de cada acción respecto a su ETF de referencia y evaluar beneficios de diversificación. | Pendiente en `app.py` (Streamlit) |
 
 No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y justifica únicamente los pertinentes.
 
@@ -75,8 +80,11 @@ No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y
 
 | Gráfico | Pregunta que ayuda a responder | Variables | Interpretación esperada |
 |---|---|---|---|
-| [Gráfico 1] | [Pregunta] | [Variables] | [Qué se podrá observar] |
-| [Gráfico 2] | [Pregunta] | [Variables] | [Qué se podrá comparar] |
+| **Mapa Dispersión Riesgo vs. Retorno** | ¿Qué activos ofrecen mejor relación rentabilidad-riesgo y cuáles presentan volatilidad excesiva sin compensación? | Volatilidad Anualizada (eje X) vs. Retorno Anualizado (eje Y). | Ubicación visual de cada par Acción vs. ETF; se espera que los ETFs (`QQQ`, `EEM`, `IBIT`) se sitúen más a la izquierda (menor riesgo) que sus acciones pares. |
+| **Evolución de Retorno Acumulado (Base 100)** | ¿Cómo ha evolucionado el capital invertido en gestión activa frente a gestión pasiva a lo largo del tiempo? | Fecha (eje X) vs. Crecimiento de $100 invertidos (eje Y). | Comparación directa de tendencias alcistas, velocidad de recuperación y brechas de rendimiento entre cada acción y su ETF. |
+| **Volatilidad Móvil (*Rolling Volatility* 30d)** | ¿En qué momentos del período 2024–2026 se disparó la incertidumbre y qué tan persistente fue? | Fecha (eje X) vs. Desviación estándar móvil anualizada a 30 días (eje Y). | Identificación de picos de estrés de mercado y comprobación de cómo los ETFs amortiguan las oscilaciones bruscas frente a acciones individuales. |
+| **Gráfico de Caídas (*Underwater / Drawdown*)** | ¿Cuál es la profundidad y duración de las peores caídas de cada activo? | Fecha (eje X) vs. Porcentaje de caída desde máximos históricos (eje Y). | Visualización clara del riesgo a la baja y comparación del tiempo de recuperación entre activos individuales y ETFs. |
+| **Matriz de Correlación (*Heatmap*)** | ¿Qué tan diversificado está realmente el conjunto de activos seleccionados? | Coeficiente de correlación de Pearson entre los 6 activos. | Detección de pares altamente correlacionados (ej. `MSTR`–`IBIT` o `NVDA`–`QQQ`) frente a activos con baja correlación útil para optimizar portafolios. |
 
 **Primer resultado verificable:** [Enlace a un cálculo o gráfico realizado con datos reales y una interpretación breve]
 
