@@ -121,14 +121,17 @@ col1, col2 = st.columns(2)
 
 with col1:
   st.subheader("🎯 Mapa Riesgo vs. Retorno")
-  df_scatter = metricas.reset_index().rename(columns={"Ticker": "Activo"})
-  df_scatter.columns.values[0] = "Activo"
+  df_scatter = metricas.copy()
+  df_scatter["Activo"] = df_scatter.index
+  # Usamos valor absoluto o tamaño fijo mínimo para evitar errores si algún retorno es negativo
+  df_scatter["Tamano"] = df_scatter["Retorno Acumulado (%)"].clip(lower=10)
+
   fig_scatter = px.scatter(
       df_scatter,
       x="Volatilidad Anual (%)",
       y="Retorno Anualizado (%)",
       text="Activo",
-      size="Retorno Acumulado (%)",
+      size="Tamano",
       color="Ratio de Sharpe",
       color_continuous_scale="Viridis",
       title="Rentabilidad Anualizada vs. Volatilidad",
