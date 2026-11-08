@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
 
@@ -100,30 +99,55 @@ riqueza = (1 + retornos).cumprod()
 drawdowns = (riqueza - riqueza.cummax()) / riqueza.cummax()
 metricas["Max Drawdown (%)"] = drawdowns.min() * 100
 
-# Cálculo de Beta respecto al benchmark elegido
 var_bench = retornos[benchmark].var()
 betas = [
     retornos[col].cov(retornos[benchmark]) / var_bench for col in datos.columns
 ]
 metricas[f"Beta (vs {benchmark})"] = betas
 
-# --- SECCIÓN 1: TABLA RESUMEN ---
-st.subheader("📊 Tabla Comparativa de Métricas Cuantitativas")
-st.dataframe(
-    metricas.style.format("{:.2f}").background_gradient(
-        subset=["Ratio de Sharpe"], cmap="RdYlGn"
-    ),
-    use_container_width=True,
-)
+# --- NAVEGACIÓN POR PESTAÑAS (st.tabs) ---
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📊 Resumen y Riesgo-Retorno",
+    "🚀 Rendimiento Acumulado",
+    "🌊 Volatilidad y Drawdown",
+    "🔗 Matriz de Correlación",
+])
 
-# --- SECCIÓN 2: GRÁFICOS PRINCIPALES ---
-col1, col2 = st.columns(2)
+# PESTAÑA 1: TABLA Y MAPA RIESGO-RETORNO
+with tab1:
+  mejor_sharpe = metricas["Ratio de Sharpe"].idxmax()
+  menor_vol = metricas["Volatilidad Anual (%)"].idxmin()
+  mayor_ret = metricas["Retorno Acumulado (%)"].idxmax()
 
-with col1:
+  k1, k2, k3 = st.columns(3)
+  k1.metric(
+      "🏆 Mejor Ratio de Sharpe",
+      mejor_sharpe,
+      f"{metricas.loc[mejor_sharpe, 'Ratio de Sharpe']:.2f}",
+  )
+  k2.metric(
+      "🛡️ Menor Volatilidad Anual",
+      menor_vol,
+      f"{metricas.loc[menor_vol, 'Volatilidad Anual (%)']:.2f}%",
+  )
+  k3.metric(
+      "📈 Mayor Retorno Acumulado",
+      mayor_ret,
+      f"{metricas.loc[mayor_ret, 'Retorno Acumulado (%)']:.2f}%",
+  )
+
+  st.divider()
+  st.subheader("Tabla Comparativa de Métricas Cuantitativas")
+  st.dataframe(
+      metricas.style.format("{:.2f}").background_gradient(
+          subset=["Ratio de Sharpe"], cmap="RdYlGn"
+      ),
+      use_container_width=True,
+  )
+
   st.subheader("🎯 Mapa Riesgo vs. Retorno")
   df_scatter = metricas.copy()
   df_scatter["Activo"] = df_scatter.index
-  # Usamos valor absoluto o tamaño fijo mínimo para evitar errores si algún retorno es negativo
   df_scatter["Tamano"] = df_scatter["Retorno Acumulado (%)"].clip(lower=10)
 
   fig_scatter = px.scatter(
@@ -137,49 +161,74 @@ with col1:
       title="Rentabilidad Anualizada vs. Volatilidad",
   )
   fig_scatter.update_traces(textposition="top center")
+  fig_scatter.update_layout(
+      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0.15)"
+  )
   st.plotly_chart(fig_scatter, use_container_width=True)
 
-with col2:
-  st.subheader("🚀 Evolución Base 100 (Crecimiento de $100)")
+# PESTAÑA 2: EVOLUCIÓN BASE 100
+with tab2:
+  st.subheader("🚀 Evolución Base 100 (Crecimiento de $100 invertidos)")
+  st.markdown(
+      "Permite visualizar cuánto habría crecido una inversión inicial de **$100"
+      " USD** en cada activo desde el inicio de la ventana alineada."
+  )
   base_100 = (datos / datos.iloc[0]) * 100
   fig_base = px.line(
       base_100,
-      labels={"value": "Valor ($)", "Date": "Fecha"},
-      title="Rendimiento Acumulado Normalizado",
+      labels={"value": "Valor ($ USD)", "Date": "Fecha"},
+      title="Rendimiento Acumulado Normalizado (Base 100)",
+  )
+  fig_base.update_layout(
+      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0.15)"
   )
   st.plotly_chart(fig_base, use_container_width=True)
 
-# --- SECCIÓN 3: VOLATILIDAD MÓVIL Y DRAWDOWN ---
-col3, col4 = st.columns(2)
+# PESTAÑA 3: VOLATILIDAD MÓVIL Y DRAWDOWN
+with tab3:
+  col3, col4 = st.columns(2)
+  with col3:
+    st.subheader(f"🌊 Volatilidad Móvil ({ventana_vol} días)")
+    vol_movil = (
+        retornos.rolling(ventana_vol).std() * np.sqrt(dias_anuales) * 100
+    )
+    fig_vol = px.line(
+        vol_movil.dropna(),
+        labels={"value": "Volatilidad Anualizada (%)", "Date": "Fecha"},
+        title=f"Dinámica de Riesgo (Rolling {ventana_vol}d)",
+    )
+    fig_vol.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0.15)"
+    )
+    st.plotly_chart(fig_vol, use_container_width=True)
 
-with col3:
-  st.subheader(f"🌊 Volatilidad Móvil ({ventana_vol} días)")
-  vol_movil = retornos.rolling(ventana_vol).std() * np.sqrt(dias_anuales) * 100
-  fig_vol = px.line(
-      vol_movil.dropna(),
-      labels={"value": "Volatilidad Anualizada (%)", "Date": "Fecha"},
-      title=f"Dinámica de Riesgo (Rolling {ventana_vol}d)",
+  with col4:
+    st.subheader("📉 Caídas desde Máximos (Drawdown)")
+    fig_dd = px.area(
+        drawdowns * 100,
+        labels={"value": "Caída (%)", "Date": "Fecha"},
+        title="Profundidad de Pérdidas Históricas",
+    )
+    fig_dd.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0.15)"
+    )
+    st.plotly_chart(fig_dd, use_container_width=True)
+
+# PESTAÑA 4: MATRIZ DE CORRELACIÓN
+with tab4:
+  st.subheader("🔗 Matriz de Correlación de Retornos")
+  st.markdown(
+      "Valores cercanos a **1.00** indican activos que se mueven en la misma"
+      " dirección; valores bajos indican mayor potencial de diversificación."
   )
-  st.plotly_chart(fig_vol, use_container_width=True)
-
-with col4:
-  st.subheader("📉 Caídas desde Máximos (Drawdown)")
-  fig_dd = px.area(
-      drawdowns * 100,
-      labels={"value": "Caída (%)", "Date": "Fecha"},
-      title="Profundidad de Pérdidas Históricas",
+  corr_matrix = retornos.corr()
+  fig_corr = px.imshow(
+      corr_matrix,
+      text_auto=".2f",
+      color_continuous_scale="RdBu_r",
+      zmin=-1,
+      zmax=1,
+      title="Correlación de Pearson entre Activos",
   )
-  st.plotly_chart(fig_dd, use_container_width=True)
-
-# --- SECCIÓN 4: MATRIZ DE CORRELACIÓN ---
-st.subheader("🔗 Matriz de Correlación de Retornos")
-corr_matrix = retornos.corr()
-fig_corr = px.imshow(
-    corr_matrix,
-    text_auto=".2f",
-    color_continuous_scale="RdBu_r",
-    zmin=-1,
-    zmax=1,
-    title="Correlación de Pearson entre Activos",
-)
-st.plotly_chart(fig_corr, use_container_width=True)
+  fig_corr.update_layout(paper_bgcolor="rgba(0,0,0,0)")
+  st.plotly_chart(fig_corr, use_container_width=True)
