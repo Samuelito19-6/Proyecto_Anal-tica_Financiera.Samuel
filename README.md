@@ -90,31 +90,48 @@ No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y
 
 ## 5. Diseño de la aplicación · S25
 
-**Investiga:** ¿cómo se construyen controles, gráficos y métricas con la herramienta elegida? ¿qué sucede cuando el usuario modifica una selección?
-
-- **Usuarios previstos:** [Quién podría consultar la aplicación]
-- **Entradas y filtros:** [Activos, fechas, parámetros...]
-- **Secciones de la interfaz:** [Pantalla principal, comparación, riesgo, etc.]
-- **Resultados visibles:** [Gráficos, tablas, indicadores y explicaciones]
-- **Interacción principal:** [Describe qué cambia cuando el usuario modifica un control]
+- **Usuarios previstos:** Estudiantes de ingeniería financiera, analistas de portafolios e inversionistas minoristas con distintos perfiles de tolerancia al riesgo (Conservador, Moderado y Agresivo) que buscan evaluar si la gestión activa compensa el riesgo frente a ETFs.
+- **Entradas y filtros:** 
+  - Selector de perfil de inversionista (`Conservador`, `Moderado`, `Agresivo`).
+  - Simulador de capital inicial a invertir en dólares (`$ USD`).
+  - Selector múltiple de activos (acciones individuales y ETFs) y selección de período histórico (`6mo`, `1y`, `2y`, `3y`, `5y`).
+  - Selector de ETF *Benchmark* para el cálculo de Beta ($\beta$) y controles deslizantes (*sliders*) para ajustar ventanas de volatilidad móvil, medias móviles (`SMA` corta y larga) y tasa libre de riesgo ($R_f$).
+- **Secciones de la interfaz (6 Pestañas / `st.tabs`):**
+  1. `📊 Resumen y Simulador`: Diagnóstico personalizado por perfil, KPIs ejecutivos, tabla comparativa de indicadores financieros/monetarios y mapa de dispersión Riesgo vs. Retorno.
+  2. `🚀 Crecimiento del Capital`: Evolución histórica en dólares (`$ USD`) del capital simulado para cada activo.
+  3. `📈 Tendencia y Medias Móviles`: Gráfico técnico de precio de cierre frente a medias móviles simples (`SMA` corta y larga).
+  4. `🌊 Volatilidad y Drawdown`: Curvas de volatilidad móvil anualizada (*Rolling Volatility*) y caídas máximas desde picos históricos (*Drawdown*).
+  5. `🔗 Matriz de Correlación`: Mapa de calor (*Heatmap*) con coeficientes de correlación de Pearson entre los activos seleccionados.
+  6. `📝 Conclusiones e Insights`: Síntesis ejecutiva dinámica, veredicto final e informe descargable en texto plano.
+- **Resultados visibles:** Tarjetas KPI interactivas, tablas formateadas con degradado de color en el Ratio de Sharpe, gráficos interactivos en Plotly con *hover* unificado, interpretaciones automáticas debajo de cada visualización y desplegables (`st.expander`) con descarga directa en `.csv`.
+- **Interacción principal:** Al cambiar el perfil de riesgo, el monto a invertir en dólares o los activos en la barra lateral, la aplicación recalcula en tiempo real el activo recomendado, el valor final proyectado en USD, el VaR monetario diario y actualiza todos los gráficos y conclusiones.
 
 **Flujo previsto:**  
-Selección de activos y parámetros → Obtención de datos → Preparación y cálculos → Visualización → Interpretación.
+Perfilamiento y selección de activos/parámetros $\rightarrow$ Extracción y limpieza de series en `yfinance` $\rightarrow$ Cálculo de retornos logarítmicos y métricas de riesgo $\rightarrow$ Visualización interactiva en 6 pestañas $\rightarrow$ Interpretación y exportación de datos (CSV/TXT).
 
-**Boceto o esquema:** [Inserta una imagen o enlace al diseño, por ejemplo `docs/boceto.png`]
+**Boceto o esquema:** Arquitectura modular de barra lateral de parámetros (`st.sidebar`) + panel principal organizado en 6 pestañas temáticas (`st.tabs`) con tema oscuro personalizado en paleta vinotinto (`.streamlit/config.toml`).
 
-**Decisión técnica:** [¿Por qué usarás Python o R y qué biblioteca de aplicación elegiste?]
+**Decisión técnica:** Se eligió **Python** junto con la biblioteca **Streamlit** por su integración nativa con el ecosistema financiero (`yfinance`, `pandas`, `numpy`) y su capacidad para desplegar interfaces interactivas rápidas sin necesidad de desarrollo frontend separado. Para las visualizaciones se seleccionó **Plotly** por ofrecer gráficos interactivos dinámicos (*zoom*, filtros de leyenda y *hover* unificado).
+
+---
 
 ## 6. Construcción y pruebas · S26 (5 de noviembre)
 
-Actualiza esta sección durante el laboratorio de desarrollo.
-
-- **Componentes implementados:** [Qué funciona realmente]
-- **Cómo ejecutar la aplicación:** [Comandos, dependencias y pasos]
-- **Dependencias:** [Archivo `requirements.txt`, `renv.lock` u otro]
-- **Pruebas realizadas:** [Caso probado, resultado esperado y resultado obtenido]
-- **Errores conocidos y cómo se resolvieron:** [Explicación]
-- **Pendientes antes del simulacro:** [Tareas concretas]
+- **Componentes implementados:**
+  - Extracción automática, auditoría de nulos y alineación temporal (*inner join* mediante `dropna()`) desde Yahoo Finance.
+  - Motor de cálculo cuantitativo: Retorno acumulado, retorno anualizado, volatilidad anualizada y móvil, Ratio de Sharpe, VaR histórico al 95% (porcentual y monetario en USD), *Max Drawdown*, coeficiente Beta ($\beta$) y medias móviles (`SMA`).
+  - Sistema de perfilamiento dinámico (`Conservador`, `Moderado`, `Agresivo`) con recomendación automática de activo y proyección de capital.
+  - Interfaz estilizada en tono vinotinto (`.streamlit/config.toml`) dividida en 6 pestañas interactivas con descarga de tablas en CSV e informe ejecutivo en TXT.
+- **Cómo ejecutar la aplicación:**
+  1. Instalar dependencias: `pip install -r requirements.txt` (`streamlit`, `yfinance`, `pandas`, `numpy`, `plotly`, `matplotlib`).
+  2. Ejecutar localmente o mediante túnel desde Google Colab: `streamlit run app.py`
+- **Pruebas realizadas:**
+  - *Prueba de integridad de datos (`Primera_Prueba_Datos_yf.ipynb`):* Se verificó la descarga de 753 registros diarios y la detección de 40–44 valores nulos iniciales en `IBIT` (cotiza desde el 11 de enero de 2024), logrando alinear una ventana limpia de **713 días hábiles** (2024-01-11 al 2026-11-12).
+  - *Prueba de interacción y perfilamiento (`Aplicación.ipynb` + túnel Cloudflare):* Se validó el recálculo dinámico al alternar entre perfiles de riesgo, modificar el capital inicial de `$10,000 USD` y cambiar las ventanas de volatilidad y medias móviles sin errores de ejecución.
+- **Problemas resueltos:**
+  - *Alineación asimétrica de series temporales:* Solucionado aplicando `.dropna()` tras la descarga para evitar sesgos por fechas sin cotización en activos recientes como `IBIT`.
+  - *Visualización de retornos negativos en gráficos de burbujas:* Se aplicó `.clip(lower=10)` al tamaño de los marcadores en `px.scatter` para evitar errores de renderizado ante variaciones negativas.
+  - *Dependencia de renderizado en tablas estilizadas:* Se incorporó `matplotlib` en `requirements.txt` para soportar el mapa de calor (`background_gradient`) en la columna del Ratio de Sharpe.
 
 > No afirmes que una función está implementada si aún no ha sido probada.
 
